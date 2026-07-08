@@ -1,0 +1,50 @@
+
+services:
+  db:
+    image: postgres:15
+    container_name: postgres_container
+    restart: always
+    environment:
+      POSTGRES_DB: StoreApp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 0451
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    command: >
+      sh -c "
+      python manage.py migrate && 
+      python manage.py createsuperuser --noinput &&
+      python manage.py runserver 0.0.0.0:8000
+      "
+    container_name: django_container
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_NAME: StoreApp
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: 0451
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DEBUG: "1"
+      DJANGO_SETTINGS_MODULE: "StoreApp.settings"
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_EMAIL: admin@example.com
+      DJANGO_SUPERUSER_PASSWORD: admin
+      DJANGO_SUPERUSER_PHONE_NUMBER: +79038032233
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
