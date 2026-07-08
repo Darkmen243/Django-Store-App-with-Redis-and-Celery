@@ -1,11 +1,22 @@
-FROM python:3.14
+FROM python:3.14-slim
 
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN python -m venv venv
-RUN . venv/bin/activate
 RUN pip install --no-cache-dir -r requirements.txt
-WORKDIR /app
+
 COPY . .
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "StoreApp.wsgi:application"]
+
+RUN chmod +x entrypoint.sh
+
+EXPOSE 8000
+
+ENTRYPOINT ["/app/entrypoint.sh"]
