@@ -17,7 +17,7 @@ else:
 EOF
 
 if [ "$DJANGO_ENV" = "production" ]; then
-    gunicorn StoreApp.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    gunicorn StoreApp.Core.wsgi:application --bind 0.0.0.0:8000 --workers 3
 else
     python manage.py runserver 0.0.0.0:8000
 fi
